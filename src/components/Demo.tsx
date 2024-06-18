@@ -1,7 +1,6 @@
 import { useState, useEffect, FormEvent, KeyboardEvent } from "react";
 import { copy, linkIcon, loader, tick } from "../assets";
 import { useLazyGetSummaryQuery } from "../services/article";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
 type Article = {
   url: string;
@@ -57,12 +56,6 @@ const Demo = () => {
     }
   };
 
-  const isFetchBaseQueryError = (
-    error: unknown
-  ): error is FetchBaseQueryError => {
-    return typeof error === "object" && error !== null && "data" in error;
-  };
-
   return (
     <section className="mt-16 w-full max-w-xl">
       <div className="flex flex-col w-full gap-2">
@@ -75,7 +68,6 @@ const Demo = () => {
             alt="link-icon"
             className="absolute left-0 my-2 ml-3 w-5"
           />
-
           <input
             type="url"
             placeholder="Paste the article link"
@@ -93,27 +85,24 @@ const Demo = () => {
           </button>
         </form>
         <div className="flex flex-col gap-1 max-h-60 overflow-y-auto">
-          {allArticles
-            .slice()
-            .reverse()
-            .map((item, index) => (
-              <div
-                key={`link-${index}`}
-                onClick={() => setArticle(item)}
-                className="link_card"
-              >
-                <div className="copy_btn" onClick={() => handleCopy(item.url)}>
-                  <img
-                    src={copied === item.url ? tick : copy}
-                    alt={copied === item.url ? "tick_icon" : "copy_icon"}
-                    className="w-[40%] h-[40%] object-contain"
-                  />
-                </div>
-                <p className="flex-1 font-satoshi text-blue-700 font-medium text-sm truncate">
-                  {item.url}
-                </p>
+          {allArticles.reverse().map((item, index) => (
+            <div
+              key={`link-${index}`}
+              onClick={() => setArticle(item)}
+              className="link_card"
+            >
+              <div className="copy_btn" onClick={() => handleCopy(item.url)}>
+                <img
+                  src={copied === item.url ? tick : copy}
+                  alt={copied === item.url ? "tick_icon" : "copy_icon"}
+                  className="w-[40%] h-[40%] object-contain"
+                />
               </div>
-            ))}
+              <p className="flex-1 font-satoshi text-blue-700 font-medium text-sm truncate">
+                {item.url}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
       <div className="my-10 max-w-full flex justify-center items-center">
@@ -124,9 +113,7 @@ const Demo = () => {
             Well, that wasn't supposed to happen...
             <br />
             <span className="font-satoshi font-normal text-gray-700">
-              {isFetchBaseQueryError(error)
-                ? error.data.error
-                : "An unexpected error occurred"}
+              {error?.data?.error}
             </span>
           </p>
         ) : (
